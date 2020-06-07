@@ -13,7 +13,7 @@ layout(location = 0) out vec4 outColor;
 // Interpolated output data from vertex shader.
 in vec3 fragPos; // World-space position
 in vec3 fragNormal; // World-space normal
-in vec4 gl_FragCoord; // window relative fragment coordinates
+layout(origin_upper_left) in vec4 gl_FragCoord; // window relative fragment coordinates
 
 void main()
 {
