@@ -17,12 +17,27 @@ layout(origin_upper_left) in vec4 gl_FragCoord; // window relative fragment coor
 
 
 
+void make_kernel(inout vec4 n[9], sampler2D tex, vec2 coord)
+{
+	float w = 1.0 / textureSize(tex_drawing, 0).x;
+	float h = 1.0 / textureSize(tex_drawing, 0).y;
+
+	n[0] = texture(tex, coord + vec2( -w, -h));
+	n[1] = texture(tex, coord + vec2(0.0, -h));
+	n[2] = texture(tex, coord + vec2(  w, -h));
+	n[3] = texture(tex, coord + vec2( -w, 0.0));
+	n[4] = texture(tex, coord);
+	n[5] = texture(tex, coord + vec2(  w, 0.0));
+	n[6] = texture(tex, coord + vec2( -w, h));
+	n[7] = texture(tex, coord + vec2(0.0, h));
+	n[8] = texture(tex, coord + vec2(  w, h));
+}
+
 
 void main()
 {
    // current position
     vec2 tex_coords = gl_FragCoord.xy  / (textureSize(tex_drawing, 0).x) ;
-
 
 
 	vec4 n[9];
