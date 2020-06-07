@@ -16,73 +16,6 @@ in vec3 fragNormal; // World-space normal
 layout(origin_upper_left) in vec4 gl_FragCoord; // window relative fragment coordinates
 
 
-// Find coordinate of matrix element from index
-vec2 kpos(int index)
-{
-    return vec2[9] (
-        vec2(-1, -1), vec2(0, -1), vec2(1, -1),
-        vec2(-1, 0), vec2(0, 0), vec2(1, 0), 
-        vec2(-1, 1), vec2(0, 1), vec2(1, 1)
-    )[index] / textureSize(tex_drawing, 0);
-}
-
-
-
-
-// Extract region of dimension 3x3 from sampler centered in uv
-// sampler : texture sampler
-// uv : current coordinates on sampler
-// return : an array of mat3, each index corresponding with a color channel
-mat3[3] region3x3(sampler2D sampler, vec2 uv)
-{
-    // Create each pixels for region
-    vec4[9] region;
-    
-    for (int i = 0; i < 9; i++)
-        region[i] = texture(sampler, uv + kpos(i));
-
-    // Create 3x3 region with 3 color channels (red, green, blue)
-    mat3[3] mRegion;
-    
-    for (int i = 0; i < 3; i++)
-        mRegion[i] = mat3(
-        	region[0][i], region[1][i], region[2][i],
-        	region[3][i], region[4][i], region[5][i],
-        	region[6][i], region[7][i], region[8][i]
-    	);
-    
-    return mRegion;
-}
-
-// Convolve a texture with kernel
-// kernel : kernel used for convolution
-// sampler : texture sampler
-// uv : current coordinates on sampler
-vec3 convolution(mat3 kernel, sampler2D sampler, vec2 uv)
-{
-    vec3 fragment;
-    
-    // Extract a 3x3 region centered in uv
-    mat3[3] region = region3x3(sampler, uv);
-    
-    // for each color channel of region
-    for (int i = 0; i < 3; i++)
-    {
-        // get region channel
-        mat3 rc = region[i];
-        // component wise multiplication of kernel by region channel
-        mat3 c = matrixCompMult(kernel, rc);
-        // add each component of matrix
-        float r = c[0][0] + c[1][0] + c[2][0]
-                + c[0][1] + c[1][1] + c[2][1]
-                + c[0][2] + c[1][2] + c[2][2];
-        
-        // for fragment at channel i, set result
-        fragment[i] = r;
-    }
-    
-    return fragment;    
-}
 
 
 void main()
@@ -91,12 +24,16 @@ void main()
     vec2 tex_coords = gl_FragCoord.xy  / (textureSize(tex_drawing, 0).x) ;
 
 
-    mat3 grad_kernel =  mat3(0, 1, 0, 1, -4, 1, 0, 1, 0);
-    // Convolve kernel with texture
-    vec3 col = convolution( grad_kernel, tex_drawing, tex_coords);
-    
-    // Output to screen
-    outColor = vec4(col, 1.0);
+
+	vec4 n[9];
+	make_kernel( n, tex_drawing , tex_coords );
+
+	vec4 sobel_edge_v = n[2] + (2.0*n[5]) + n[8] - (n[0] + (2.0*n[3]) + n[6]);
+  	vec4 sobel_edge_h = n[0] + (2.0*n[1]) + n[2] - (n[6] + (2.0*n[7]) + n[8]);
+	vec4 sobel = sqrt((sobel_edge_h * sobel_edge_h) + (sobel_edge_v * sobel_edge_v));
+	vec3 out_vec =  vec3(length(sobel_edge_v), length(sobel_edge_h),0.0);
+	outColor = vec4( normalize(out_vec), 1.0 );
+
 
 
 
