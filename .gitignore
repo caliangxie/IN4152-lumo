@@ -2,7 +2,7 @@
 
 */out/
 
-
+out/
 # Prerequisites
 *.d
 
@@ -10,7 +10,7 @@
 *.slo
 *.lo
 *.o
-*.obj
+
 
 # Precompiled Headers
 *.gch

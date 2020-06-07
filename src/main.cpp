@@ -47,7 +47,6 @@ int main()
     });
 
     const Shader mainShader = ShaderBuilder().addStage(GL_VERTEX_SHADER, "shaders/shader_vert.glsl").addStage(GL_FRAGMENT_SHADER, "shaders/shader_frag.glsl").build();
-    const Shader normal_shader = ShaderBuilder().addStage(GL_VERTEX_SHADER, "shaders/shader_vert.glsl").build();
 
     // === Load a texture for exercise 5 ===
     // Create Texture
@@ -95,57 +94,10 @@ int main()
     glEnableVertexArrayAttrib(vao, 0);
     glEnableVertexArrayAttrib(vao, 1);
 
-    // === Create Texture for image ===
-    GLuint tex_drawing;
-    const int SHADOWTEX_WIDTH = 1024;
-    const int SHADOWTEX_HEIGHT = 1024;
-    glCreateTextures(GL_TEXTURE_2D, 1, &tex_drawing);
-    glTextureStorage2D(tex_drawing, 1, GL_DEPTH_COMPONENT32F, SHADOWTEX_WIDTH, SHADOWTEX_HEIGHT);
-
-    // Set behaviour for when texture coordinates are outside the [0, 1] range.
-    glTextureParameteri(tex_drawing, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTextureParameteri(tex_drawing, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-    // Set interpolation for texture sampling (GL_NEAREST for no interpolation).
-    glTextureParameteri(tex_drawing, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTextureParameteri(tex_drawing, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-    // === Create framebuffer for extra texture ===
-    GLuint framebuffer;
-    glCreateFramebuffers(1, &framebuffer);
-    glNamedFramebufferTexture(framebuffer, GL_DEPTH_ATTACHMENT, tex_drawing, 0);
 
     // Main loop
     while (!window.shouldClose()) {
         window.updateInput();
-
-        // === Stub code for you to fill in order to render the shadow map ===
-        {
-            // Bind the off-screen framebuffer
-            glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-
-            // Clear the shadow map and set needed options
-            glClearDepth(1.0f);
-            glClear(GL_DEPTH_BUFFER_BIT);
-            glEnable(GL_DEPTH_TEST);
-
-            // Bind the shader
-            normal_shader.bind();
-
-            // Set viewport size
-            glViewport(0, 0, SHADOWTEX_WIDTH, SHADOWTEX_HEIGHT);
-
-            // .... HERE YOU MUST ADD THE CORRECT UNIFORMS FOR RENDERING THE SHADOW MAP
-
-            // Bind vertex data
-            glBindVertexArray(vao);
-
-            // Execute draw command
-            glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(mesh.indices.size()), GL_UNSIGNED_INT, nullptr);
-
-            // Unbind the off-screen framebuffer
-            glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        }
 
         // Bind the shader
         mainShader.bind();
@@ -162,10 +114,10 @@ int main()
         // Bind vertex data
         glBindVertexArray(vao);
 
-        // Bind the shadow map to texture slot 0
+        // Bind the darwing texture to texture slot 0
         GLuint texture_unit = 0;
         glActiveTexture(GL_TEXTURE0 + texture_unit);
-        glBindTexture(GL_TEXTURE_2D, tex_drawing);
+        glBindTexture(GL_TEXTURE_2D, texLight);
         glUniform1ui(2, texture_unit);
 
         // Set viewport size
@@ -186,8 +138,7 @@ int main()
     }
 
     // Be a nice citizen and clean up after yourself.
-    glDeleteFramebuffers(1, &framebuffer);
-    glDeleteTextures(1, &tex_drawing);
+    //glDeleteFramebuffers(1, &framebuffer);
     glDeleteTextures(1, &texLight);
     glDeleteBuffers(1, &ibo);
     glDeleteBuffers(1, &vbo);
