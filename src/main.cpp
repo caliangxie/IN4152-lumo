@@ -51,7 +51,7 @@ int main()
     // === Load a texture for exercise 5 ===
     // Create Texture
     int texWidth, texHeight, texChannels;
-    stbi_uc* pixels = stbi_load("resources/toon_map.png", &texWidth, &texHeight, &texChannels, 3);
+    stbi_uc* pixels = stbi_load("resources/shape5.png", &texWidth, &texHeight, &texChannels, 3);
 
     GLuint texLight;
     glCreateTextures(GL_TEXTURE_2D, 1, &texLight);
