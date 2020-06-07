@@ -28,7 +28,7 @@ int main()
 {
     Window window { glm::ivec2(WIDTH, HEIGHT), "Paper Presentation Demo", false };
 
-    Camera camera { &window, glm::vec3(1.2f, 1.1f, 0.9f), -glm::vec3(1.2f, 1.1f, 0.9f) };
+    Camera camera { &window, glm::vec3(1.0f, 0.0f, 0.0f), -glm::vec3(1.0f, 0.0f, 0.0f) }; // -glm::vec3(1.2f, 1.1f, 0.9f)  forward direction is -x 
     constexpr float fov = glm::pi<float>() / 4.0f;
     constexpr float aspect = static_cast<float>(WIDTH) / static_cast<float>(HEIGHT);
     const glm::mat4 mainProjectionMatrix = glm::perspective(fov, aspect, 0.1f, 30.0f);
