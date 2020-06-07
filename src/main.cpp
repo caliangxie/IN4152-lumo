@@ -109,6 +109,8 @@ int main()
         const glm::vec3 cameraPos = camera.cameraPos();
         glUniform3fv(1, 1, glm::value_ptr(cameraPos));
 
+        // set texture size 
+
 
         // Bind vertex data
         glBindVertexArray(vao);
