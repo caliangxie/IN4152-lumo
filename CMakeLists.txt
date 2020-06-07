@@ -40,7 +40,7 @@ if (UNIX)
 	set(PLATFORM_SPECIFIC_PACKAGES std::filesystem ${ASSIMP_ZLIB_LIBRARY} ${ASSIMP_IRRXML_LIBRARY})
 endif()
 
-add_executable(Practical6
+add_executable(paper_presentation
 	"src/main.cpp"
 	"src/camera.cpp"
 	"src/mesh.cpp"
@@ -48,8 +48,8 @@ add_executable(Practical6
 	"src/window.cpp"
 	"src/stb_image.cpp"
 	"src/tinyobj.cpp")
-target_compile_features(Practical6 PRIVATE cxx_std_17)
-target_link_libraries(Practical6 PRIVATE
+target_compile_features(paper_presentation PRIVATE cxx_std_17)
+target_link_libraries(paper_presentation PRIVATE
 	OpenGL::GL GLEW::GLEW
 	glfw
 	glm
@@ -57,13 +57,13 @@ target_link_libraries(Practical6 PRIVATE
 	fmt::fmt
 	assimp::assimp
 	${PLATFORM_SPECIFIC_PACKAGES})
-enable_sanitizers(Practical6)
-set_project_warnings(Practical6)
+enable_sanitizers(paper_presentation)
+set_project_warnings(paper_presentation)
 
 # Copy all files in the resources folder to the build directory after every successful build.
-add_custom_command(TARGET Practical6 POST_BUILD
+add_custom_command(TARGET paper_presentation POST_BUILD
 	COMMAND ${CMAKE_COMMAND} -E copy_directory
-	"${CMAKE_CURRENT_LIST_DIR}/resources/" "$<TARGET_FILE_DIR:Practical6>/resources/")
+	"${CMAKE_CURRENT_LIST_DIR}/resources/" "$<TARGET_FILE_DIR:paper_presentation>/resources/")
 
 # We would like to copy the files when they changed. Even if no *.cpp files were modified (and
 # thus no build is triggered). We tell CMake that the executable depends on the shader files in
@@ -87,4 +87,4 @@ foreach (shader_file IN LISTS shader_sources)
 	LIST(APPEND shader_copies "${CMAKE_BINARY_DIR}/shaders/${file_name}")
 endforeach()
 add_custom_target(copy_shaders DEPENDS ${shader_copies})
-add_dependencies(Practical6 copy_shaders)
+add_dependencies(paper_presentation copy_shaders)

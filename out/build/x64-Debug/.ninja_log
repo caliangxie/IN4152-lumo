@@ -1,0 +1,12 @@
+# ninja log v5
+7	61	613229390	shaders/shadow_vert.glsl	b899ac9a2a96981f
+5	67	613229390	shaders/shader_vert.glsl	9fab5994e5b654db
+1	67	613229390	shaders/shader_frag.glsl	6f9a1e9b69acfa1d
+74	769	613229391	CMakeFiles/Practical6.dir/src/stb_image.cpp.obj	b5af0af3d227bac
+67	1297	613229391	CMakeFiles/Practical6.dir/src/camera.cpp.obj	9aec3fc70c3089b4
+83	1725	613229392	CMakeFiles/Practical6.dir/src/window.cpp.obj	956ed84230c94deb
+86	1913	613229392	CMakeFiles/Practical6.dir/src/tinyobj.cpp.obj	e0eeaa097dd3dc13
+71	2219	613229392	CMakeFiles/Practical6.dir/src/main.cpp.obj	796f05a46915354d
+77	2602	613229393	CMakeFiles/Practical6.dir/src/shader.cpp.obj	31952f5ded898f6a
+80	2737	613229393	CMakeFiles/Practical6.dir/src/mesh.cpp.obj	aa539ef4698275fd
+2738	4168	613229393	Practical6.exe	2e21c41be6210c96

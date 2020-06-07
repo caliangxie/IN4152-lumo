@@ -2,10 +2,10 @@
 	"artifacts" : 
 	[
 		{
-			"path" : "Practical6.exe"
+			"path" : "paper_presentation.exe"
 		},
 		{
-			"path" : "Practical6.pdb"
+			"path" : "paper_presentation.pdb"
 		}
 	],
 	"backtrace" : 2,
@@ -226,7 +226,7 @@
 			"id" : "copy_shaders::@6890427a1f51a3e7e1df"
 		}
 	],
-	"id" : "Practical6::@6890427a1f51a3e7e1df",
+	"id" : "paper_presentation::@6890427a1f51a3e7e1df",
 	"link" : 
 	{
 		"commandFragments" : 
@@ -274,8 +274,8 @@
 		],
 		"language" : "CXX"
 	},
-	"name" : "Practical6",
-	"nameOnDisk" : "Practical6.exe",
+	"name" : "paper_presentation",
+	"nameOnDisk" : "paper_presentation.exe",
 	"paths" : 
 	{
 		"build" : ".",

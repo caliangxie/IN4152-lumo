@@ -1,4 +1,4 @@
-C:/Users/Ryudas/Downloads/paper_presentation/out/build/x64-Debug/CMakeFiles/Practical6.dir
+C:/Users/Ryudas/Downloads/paper_presentation/out/build/x64-Debug/CMakeFiles/paper_presentation.dir
 C:/Users/Ryudas/Downloads/paper_presentation/out/build/x64-Debug/CMakeFiles/rebuild_cache.dir
 C:/Users/Ryudas/Downloads/paper_presentation/out/build/x64-Debug/CMakeFiles/copy_shaders.dir
 C:/Users/Ryudas/Downloads/paper_presentation/out/build/x64-Debug/CMakeFiles/edit_cache.dir

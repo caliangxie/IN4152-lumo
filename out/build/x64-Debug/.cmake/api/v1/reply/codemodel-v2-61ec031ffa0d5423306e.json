@@ -39,16 +39,16 @@
 			[
 				{
 					"directoryIndex" : 0,
-					"id" : "Practical6::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-Practical6-Debug-f296b185564f114c5862.json",
-					"name" : "Practical6",
+					"id" : "copy_shaders::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-copy_shaders-Debug-821e479fae03ee086a2e.json",
+					"name" : "copy_shaders",
 					"projectIndex" : 0
 				},
 				{
 					"directoryIndex" : 0,
-					"id" : "copy_shaders::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-copy_shaders-Debug-821e479fae03ee086a2e.json",
-					"name" : "copy_shaders",
+					"id" : "paper_presentation::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-paper_presentation-Debug-404e8da73113e2f5b666.json",
+					"name" : "paper_presentation",
 					"projectIndex" : 0
 				}
 			]

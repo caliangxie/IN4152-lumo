@@ -20,13 +20,13 @@ DISABLE_WARNINGS_POP()
 #include <vector>
 
 // Configuration
-constexpr int WIDTH = 600;
-constexpr int HEIGHT = 600;
+constexpr int WIDTH = 512;
+constexpr int HEIGHT = 512;
 
 
 int main()
 {
-    Window window { glm::ivec2(WIDTH, HEIGHT), "Practical 6 - Shadow Mapping", false };
+    Window window { glm::ivec2(WIDTH, HEIGHT), "Paper Presentation Demo", false };
 
     Camera camera { &window, glm::vec3(1.2f, 1.1f, 0.9f), -glm::vec3(1.2f, 1.1f, 0.9f) };
     constexpr float fov = glm::pi<float>() / 4.0f;
@@ -47,12 +47,12 @@ int main()
     });
 
     const Shader mainShader = ShaderBuilder().addStage(GL_VERTEX_SHADER, "shaders/shader_vert.glsl").addStage(GL_FRAGMENT_SHADER, "shaders/shader_frag.glsl").build();
-    const Shader shadowShader = ShaderBuilder().addStage(GL_VERTEX_SHADER, "shaders/shader_vert.glsl").build();
+    const Shader normal_shader = ShaderBuilder().addStage(GL_VERTEX_SHADER, "shaders/shader_vert.glsl").build();
 
     // === Load a texture for exercise 5 ===
     // Create Texture
     int texWidth, texHeight, texChannels;
-    stbi_uc* pixels = stbi_load("resources/smiley.png", &texWidth, &texHeight, &texChannels, 3);
+    stbi_uc* pixels = stbi_load("resources/test_text.png", &texWidth, &texHeight, &texChannels, 3);
 
     GLuint texLight;
     glCreateTextures(GL_TEXTURE_2D, 1, &texLight);
@@ -68,7 +68,7 @@ int main()
     glTextureParameteri(texLight, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     // Load mesh from disk.
-    const Mesh mesh = loadMesh("resources/scene.obj");
+    const Mesh mesh = loadMesh("resources/quad.obj");
 
     // Create Element(Index) Buffer Object and Vertex Buffer Objects.
     GLuint ibo;
@@ -95,25 +95,25 @@ int main()
     glEnableVertexArrayAttrib(vao, 0);
     glEnableVertexArrayAttrib(vao, 1);
 
-    // === Create Shadow Texture ===
-    GLuint texShadow;
+    // === Create Texture for image ===
+    GLuint tex_drawing;
     const int SHADOWTEX_WIDTH = 1024;
     const int SHADOWTEX_HEIGHT = 1024;
-    glCreateTextures(GL_TEXTURE_2D, 1, &texShadow);
-    glTextureStorage2D(texShadow, 1, GL_DEPTH_COMPONENT32F, SHADOWTEX_WIDTH, SHADOWTEX_HEIGHT);
+    glCreateTextures(GL_TEXTURE_2D, 1, &tex_drawing);
+    glTextureStorage2D(tex_drawing, 1, GL_DEPTH_COMPONENT32F, SHADOWTEX_WIDTH, SHADOWTEX_HEIGHT);
 
     // Set behaviour for when texture coordinates are outside the [0, 1] range.
-    glTextureParameteri(texShadow, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTextureParameteri(texShadow, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTextureParameteri(tex_drawing, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTextureParameteri(tex_drawing, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
     // Set interpolation for texture sampling (GL_NEAREST for no interpolation).
-    glTextureParameteri(texShadow, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTextureParameteri(texShadow, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTextureParameteri(tex_drawing, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTextureParameteri(tex_drawing, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
     // === Create framebuffer for extra texture ===
     GLuint framebuffer;
     glCreateFramebuffers(1, &framebuffer);
-    glNamedFramebufferTexture(framebuffer, GL_DEPTH_ATTACHMENT, texShadow, 0);
+    glNamedFramebufferTexture(framebuffer, GL_DEPTH_ATTACHMENT, tex_drawing, 0);
 
     // Main loop
     while (!window.shouldClose()) {
@@ -130,7 +130,7 @@ int main()
             glEnable(GL_DEPTH_TEST);
 
             // Bind the shader
-            shadowShader.bind();
+            normal_shader.bind();
 
             // Set viewport size
             glViewport(0, 0, SHADOWTEX_WIDTH, SHADOWTEX_HEIGHT);
@@ -165,7 +165,7 @@ int main()
         // Bind the shadow map to texture slot 0
         GLuint texture_unit = 0;
         glActiveTexture(GL_TEXTURE0 + texture_unit);
-        glBindTexture(GL_TEXTURE_2D, texShadow);
+        glBindTexture(GL_TEXTURE_2D, tex_drawing);
         glUniform1ui(2, texture_unit);
 
         // Set viewport size
@@ -187,7 +187,7 @@ int main()
 
     // Be a nice citizen and clean up after yourself.
     glDeleteFramebuffers(1, &framebuffer);
-    glDeleteTextures(1, &texShadow);
+    glDeleteTextures(1, &tex_drawing);
     glDeleteTextures(1, &texLight);
     glDeleteBuffers(1, &ibo);
     glDeleteBuffers(1, &vbo);
