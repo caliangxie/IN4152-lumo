@@ -51,7 +51,7 @@ int main()
     // === Load a texture for exercise 5 ===
     // Create Texture
     int texWidth, texHeight, texChannels;
-    stbi_uc* pixels = stbi_load("resources/test_text.png", &texWidth, &texHeight, &texChannels, 3);
+    stbi_uc* pixels = stbi_load("resources/toon_map.png", &texWidth, &texHeight, &texChannels, 3);
 
     GLuint texLight;
     glCreateTextures(GL_TEXTURE_2D, 1, &texLight);
@@ -109,7 +109,6 @@ int main()
         const glm::vec3 cameraPos = camera.cameraPos();
         glUniform3fv(1, 1, glm::value_ptr(cameraPos));
 
-        // .... HERE YOU MUST ADD THE CORRECT UNIFORMS FOR RENDERING THE MAIN IMAGE
 
         // Bind vertex data
         glBindVertexArray(vao);

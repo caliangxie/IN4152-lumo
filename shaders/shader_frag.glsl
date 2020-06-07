@@ -2,10 +2,10 @@
 
 // Global variables for lighting calculations.
 layout(location = 1) uniform vec3 viewPos;
-layout(location = 2) uniform sampler2D texShadow;
+layout(location = 2) uniform sampler2D tex_drawing;
 
-layout(location = 3) uniform mat4 lightMVP;
-layout(location = 4) uniform vec3 lightPos = vec3(3, 3, 3);
+//layout(location = 3) uniform mat4 lightMVP;
+//layout(location = 4) uniform vec3 lightPos = vec3(3, 3, 3);
 
 // Output for on-screen color.
 layout(location = 0) out vec4 outColor;
@@ -17,7 +17,8 @@ in vec3 fragNormal; // World-space normal
 void main()
 {
     // Output the normal as color.
-    vec3 lightDir = normalize(lightPos - fragPos);
+  // vec3 lightDir = normalize(lightPos - fragPos);
 
-    outColor = vec4(vec3(max(dot(fragNormal, lightDir), 0.0)), 1.0);
+    outColor =  texture(tex_drawing,  vec2(0.0, 0.0) );
+    //outColor = vec4(vec3(max(dot(fragNormal, lightDir), 0.0)), 1.0);
 }
