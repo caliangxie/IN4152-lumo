@@ -51,7 +51,7 @@ int main()
     // === Load a texture for exercise 5 ===
     // Create Texture
     int texWidth, texHeight, texChannels;
-    stbi_uc* pixels = stbi_load("resources/shape5.png", &texWidth, &texHeight, &texChannels, 3);
+    stbi_uc* pixels = stbi_load("resources/shape4.png", &texWidth, &texHeight, &texChannels, 3);
 
     GLuint texLight;
     glCreateTextures(GL_TEXTURE_2D, 1, &texLight);
@@ -109,8 +109,8 @@ int main()
         const glm::vec3 cameraPos = camera.cameraPos();
         glUniform3fv(1, 1, glm::value_ptr(cameraPos));
 
-        // set texture size 
-
+        // set fragment normal
+        
 
         // Bind vertex data
         glBindVertexArray(vao);
@@ -119,7 +119,7 @@ int main()
         GLuint texture_unit = 0;
         glActiveTexture(GL_TEXTURE0 + texture_unit);
         glBindTexture(GL_TEXTURE_2D, texLight);
-        glUniform1ui(2, texture_unit);
+        glUniform1i(2, texture_unit);
 
         // Set viewport size
         glViewport(0, 0, WIDTH, HEIGHT);
