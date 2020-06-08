@@ -106,8 +106,11 @@ int main()
         glUniformMatrix4fv(0, 1, GL_FALSE, glm::value_ptr(mvp));
 
         // Set view position
-        //const glm::vec3 cameraPos = camera.cameraPos();
-        // glUniform3fv(1, 1, glm::value_ptr(cameraPos));
+        const glm::vec3 cameraPos = camera.cameraPos();
+       // glUniform3fv(1, 1, glm::value_ptr(cameraPos));
+
+        // set fragment normal
+        
 
         // Bind vertex data
         glBindVertexArray(vao);
