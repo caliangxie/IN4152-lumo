@@ -19,7 +19,7 @@ void main() {
 	// Subtract from 1 because otherwise coordinates are flipped across both axes
 	vec2 texCoords = 1.0 - gl_FragCoord.xy / textureSize(approxNormals, 0).x;
 
-	outColor = texture(approxNormals, texCoords);
+	outColor = 0.5 - texture(approxNormals, texCoords);
 
 	//mat3 grad_kernel =  mat3(0, 1, 0, 1, -4, 1, 0, 1, 0);
 	// Convolve kernel with texture
