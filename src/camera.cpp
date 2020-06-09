@@ -16,10 +16,10 @@ Camera::Camera(Window* pWindow, const glm::vec3& pos, const glm::vec3& forward)
     , m_forward(glm::normalize(forward))
     , m_pWindow(pWindow)
 {
-    pWindow->registerPostInputUpdateCallback(
+    /*pWindow->registerPostInputUpdateCallback(
         [this]() {
             updateCamera();
-        });
+        });*/
 }
 
 void Camera::setUserInteraction(bool enabled)
