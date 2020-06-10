@@ -17,7 +17,8 @@ layout(location = 0) out vec4 outColor;
 
 void main() {
 	// Subtract from 1 because otherwise coordinates are flipped across both axes
-	vec2 texCoords = 1.0 - gl_FragCoord.xy / textureSize(approxNormals, 0).x;
+	vec2 texCoords = gl_FragCoord.xy / textureSize(approxNormals, 0).x;
+	texCoords.y = 1.0 - texCoords.y;
 
 	outColor = 0.5 - texture(approxNormals, texCoords);
 
