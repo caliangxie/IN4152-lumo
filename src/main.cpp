@@ -23,6 +23,56 @@ DISABLE_WARNINGS_POP()
 constexpr int WIDTH = 512;
 constexpr int HEIGHT = 512;
 
+glm::mat4 mvp;
+GLuint vao;
+Mesh mesh;
+int currentImageIndex = 1;
+
+void shaderPass(const Shader &shader, const GLuint inputTex, const GLuint framebuffer) {
+    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+
+    // Bind the shader
+    shader.bind();
+
+    glUniformMatrix4fv(0, 1, GL_FALSE, glm::value_ptr(mvp));
+
+    // Bind vertex data
+    glBindVertexArray(vao);
+
+    // Bind the drawing texture to texture slot 0
+    GLuint texture_unit = 0;
+    glActiveTexture(GL_TEXTURE0 + texture_unit);
+    glBindTexture(GL_TEXTURE_2D, inputTex);
+    glUniform1i(2, texture_unit);
+
+    // Set viewport size
+    glViewport(0, 0, WIDTH, HEIGHT);
+
+    // Clear the framebuffer to black and depth to maximum value
+    glClearDepth(1.0f);
+    glClearColor(0.1f, 0.2f, 0.3f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glDisable(GL_CULL_FACE);
+    glEnable(GL_DEPTH_TEST);
+
+    // Execute draw command
+    glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(mesh.indices.size()), GL_UNSIGNED_INT, nullptr);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+inline void initTexture(GLuint &tex) {
+    glCreateTextures(GL_TEXTURE_2D, 1, &tex);
+    glTextureStorage2D(tex, 1, GL_RGB8, WIDTH, HEIGHT);
+
+    // Set behaviour for when texture coordinates are outside the [0, 1] range.
+    glTextureParameteri(tex, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTextureParameteri(tex, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+    // Set interpolation for texture sampling (GL_NEAREST for no interpolation).
+    glTextureParameteri(tex, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTextureParameteri(tex, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+}
 
 int main()
 {
@@ -38,8 +88,13 @@ int main()
     window.registerKeyCallback([&](int key, int /* scancode */, int action, int /* mods */) {
         switch (key) {
         case GLFW_KEY_1:
+            currentImageIndex = 1;
             break;
         case GLFW_KEY_2:
+            currentImageIndex = 2;
+            break;
+        case GLFW_KEY_3:
+            currentImageIndex = 3;
             break;
         default:
             break;
@@ -52,6 +107,12 @@ int main()
     const Shader interpShader = ShaderBuilder()
         .addStage(GL_VERTEX_SHADER, "shaders/shader_vert.glsl")
         .addStage(GL_FRAGMENT_SHADER, "shaders/interp_frag.glsl").build();
+    const Shader texturingShader = ShaderBuilder()
+        .addStage(GL_VERTEX_SHADER, "shaders/shader_vert.glsl")
+        .addStage(GL_FRAGMENT_SHADER, "shaders/texturing_frag.glsl").build();
+    const Shader renderShader = ShaderBuilder()
+        .addStage(GL_VERTEX_SHADER, "shaders/shader_vert.glsl")
+        .addStage(GL_FRAGMENT_SHADER, "shaders/render_frag.glsl").build();
 
     // === Load a texture for exercise 5 ===
     // Create Texture
@@ -59,20 +120,11 @@ int main()
     stbi_uc* pixels = stbi_load("resources/shape4.png", &texWidth, &texHeight, &texChannels, 3);
 
     GLuint texDrawing;
-    glCreateTextures(GL_TEXTURE_2D, 1, &texDrawing);
-    glTextureStorage2D(texDrawing, 1, GL_RGB8, texWidth, texHeight);
+    initTexture(texDrawing);
     glTextureSubImage2D(texDrawing, 0, 0, 0, texWidth, texHeight, GL_RGB, GL_UNSIGNED_BYTE, pixels);
 
-    // Set behaviour for when texture coordinates are outside the [0, 1] range.
-    glTextureParameteri(texDrawing, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTextureParameteri(texDrawing, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-    // Set interpolation for texture sampling (GL_NEAREST for no interpolation).
-    glTextureParameteri(texDrawing, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTextureParameteri(texDrawing, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
     // Load mesh from disk.
-    const Mesh mesh = loadMesh("resources/quad.obj");
+    mesh = loadMesh("resources/quad.obj");
 
     // Create Element(Index) Buffer Object and Vertex Buffer Objects.
     GLuint ibo;
@@ -85,7 +137,7 @@ int main()
 
     // Bind vertex data to shader inputs using their index (location).
     // These bindings are stored in the Vertex Array Object.
-    GLuint vao;
+    //GLuint vao;
     glCreateVertexArrays(1, &vao);
 
     // The indicies (pointing to vertices) should be read from the index buffer.
@@ -100,16 +152,18 @@ int main()
     glEnableVertexArrayAttrib(vao, 1);
 
     GLuint texApprox;
-    glCreateTextures(GL_TEXTURE_2D, 1, &texApprox);
-    glTextureStorage2D(texApprox, 1, GL_RGB8, WIDTH, HEIGHT);
+    initTexture(texApprox);
 
-    // Set behaviour for when texture coordinates are outside the [0, 1] range.
-    glTextureParameteri(texApprox, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTextureParameteri(texApprox, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    GLuint texInterp;
+    initTexture(texInterp);
 
-    // Set interpolation for texture sampling (GL_NEAREST for no interpolation).
-    glTextureParameteri(texApprox, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTextureParameteri(texApprox, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    GLuint textureMap;
+    initTexture(textureMap);
+    pixels = stbi_load("resources/grid.png", &texWidth, &texHeight, &texChannels, 3);
+    glTextureSubImage2D(textureMap, 0, 0, 0, texWidth, texHeight, GL_RGB, GL_UNSIGNED_BYTE, pixels);
+
+    GLuint texMappedTexture;
+    initTexture(texMappedTexture);
 
     // === Create framebuffer for extra texture ===
     GLuint framebuffer;
@@ -119,13 +173,18 @@ int main()
     // Main loop
     while (!window.shouldClose()) {
         window.updateInput();
-        const glm::mat4 mvp = mainProjectionMatrix * camera.viewMatrix(); // Assume model matrix is identity.
-        // First stage, normal approximation
+        mvp = mainProjectionMatrix * camera.viewMatrix(); // Assume model matrix is identity.
+        shaderPass(approxShader, texDrawing, framebuffer);
+
+        glNamedFramebufferTexture(framebuffer, GL_COLOR_ATTACHMENT0, texInterp, 0);
+        shaderPass(interpShader, texApprox, framebuffer);
+
+
+        glNamedFramebufferTexture(framebuffer, GL_COLOR_ATTACHMENT0, texMappedTexture, 0);
         {
             glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-
             // Bind the shader
-            approxShader.bind();
+            texturingShader.bind();
 
             glUniformMatrix4fv(0, 1, GL_FALSE, glm::value_ptr(mvp));
 
@@ -135,8 +194,13 @@ int main()
             // Bind the drawing texture to texture slot 0
             GLuint texture_unit = 0;
             glActiveTexture(GL_TEXTURE0 + texture_unit);
-            glBindTexture(GL_TEXTURE_2D, texDrawing);
+            glBindTexture(GL_TEXTURE_2D, texInterp);
             glUniform1i(2, texture_unit);
+
+            GLuint texture_unit2 = 1;
+            glActiveTexture(GL_TEXTURE1);
+            glBindTexture(GL_TEXTURE_2D, textureMap);
+            glUniform1i(3, texture_unit2);
 
             // Set viewport size
             glViewport(0, 0, WIDTH, HEIGHT);
@@ -150,14 +214,12 @@ int main()
 
             // Execute draw command
             glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(mesh.indices.size()), GL_UNSIGNED_INT, nullptr);
-
             glBindFramebuffer(GL_FRAMEBUFFER, 0);
         }
 
-        // Second stage, normal interpolation
         {
             // Bind the shader
-            interpShader.bind();
+            renderShader.bind();
 
             glUniformMatrix4fv(0, 1, GL_FALSE, glm::value_ptr(mvp));
 
@@ -167,7 +229,17 @@ int main()
             // Bind the drawing texture to texture slot 0
             GLuint texture_unit = 0;
             glActiveTexture(GL_TEXTURE0 + texture_unit);
-            glBindTexture(GL_TEXTURE_2D, texApprox);
+            switch (currentImageIndex) {
+            case 1: 
+                glBindTexture(GL_TEXTURE_2D, texApprox);
+                break;
+            case 2:
+                glBindTexture(GL_TEXTURE_2D, texInterp);
+                break;
+            case 3:
+                glBindTexture(GL_TEXTURE_2D, texMappedTexture);
+                break;
+            }
             glUniform1i(2, texture_unit);
 
             // Set viewport size
@@ -192,6 +264,8 @@ int main()
     glDeleteFramebuffers(1, &framebuffer);
     glDeleteTextures(1, &texDrawing);
     glDeleteTextures(1, &texApprox);
+    glDeleteTextures(1, &textureMap);
+    glDeleteTextures(1, &texMappedTexture);
     glDeleteBuffers(1, &ibo);
     glDeleteBuffers(1, &vbo);
     glDeleteVertexArrays(1, &vao);
