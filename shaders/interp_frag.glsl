@@ -32,13 +32,16 @@ void get_hor_normals(inout vec4 normals[2], sampler2D tex, vec2 coord)
 		// update location
 		normals[0].y = y_coord;
 
+
 		// get texture value
-		normals[0].zw = (texture(tex_normals, normals[0].xy)).xy ;
+		vec2 temp = (texture(tex_normals, normals[0].xy)).xy ;
+
 
 		// Check if there is a gradient at current location
-		bool bool_cond = all( equal( normals[0].zw , vec2(0.0, 0.0)) );
+		bool bool_cond = all( notEqual( temp , vec2(0.0, 0.0)) );
 		// in case there is break this loop
-		if( !bool_cond){
+		if( bool_cond){
+			normals[0].zw = temp;
 			break;
 		}
 	}
@@ -47,18 +50,71 @@ void get_hor_normals(inout vec4 normals[2], sampler2D tex, vec2 coord)
 
 	// find normal to the right
     y_coord = coord.y + step_size;
-	for (y_coord; y_coord <  1.0 ; y_coord += step_size){
+	for (y_coord; y_coord <=  1.0 ; y_coord += step_size){
 		// update location
 		normals[1].y = y_coord;
 
 		// get texture value
-		normals[1].zw = (texture(tex_normals, normals[1].xy)).xy ;
+		vec2 temp = (texture(tex_normals, normals[1].xy)).xy ;
 
 
 		// Check if there is a gradient at current location
-		bool bool_cond = all( equal( normals[1].zw , vec2(0.0, 0.0)) );
+		bool bool_cond = all( notEqual( temp , vec2(0.0, 0.0)) );
 		// in case there is break this loop
-		if( !bool_cond){
+		if( bool_cond){
+			normals[1].zw = temp;
+			break;
+		}
+	}
+
+}
+
+void get_vert_normals(inout vec4 normals[2], sampler2D tex, vec2 coord)
+{
+	float step_size = 1.0 / textureSize(tex_normals, 0).x;
+	int text_size =  textureSize(tex_normals, 0).x;
+
+	// initialization
+	normals[0] = vec4(coord, 0.0, 0.0);
+	normals[1] = vec4(coord, 0.0, 0.0);
+
+	float x_coord = 0.0;
+	// find normal to the left 
+	for (x_coord; x_coord <  coord.x ; x_coord += step_size){
+		// update location
+		normals[0].x = x_coord;
+
+
+		// get texture value
+		vec2 temp = (texture(tex_normals, normals[0].xy)).xy ;
+
+
+		// Check if there is a gradient at current location
+		bool bool_cond = all( notEqual( temp , vec2(0.0, 0.0)) );
+		// in case there is break this loop
+		if( bool_cond){
+			normals[0].zw = temp;
+			break;
+		}
+	}
+
+
+
+	// find normal to the right
+    x_coord = coord.x + step_size;
+	for (x_coord; x_coord <=  1.0 ; x_coord += step_size){
+		// update location
+		normals[1].x = x_coord;
+
+		// get texture value
+		vec2 temp = (texture(tex_normals, normals[1].xy)).xy ;
+
+
+		// Check if there is a gradient at current location
+		bool bool_cond = all( notEqual( temp , vec2(0.0, 0.0)) );
+		// in case there is break this loop
+		if( bool_cond){
+			normals[1].zw = temp;
 			break;
 		}
 	}
@@ -71,23 +127,32 @@ void main() {
 	vec2 tex_coords = gl_FragCoord.xy / textureSize(tex_normals, 0).x;
 	tex_coords.y = 1.0 - tex_coords.y;
 
+		// retrieve current element RG colour 
+	vec2 curr_col = (texture(tex_normals, tex_coords)).xy;
 
 		
-	vec4 normals[2];
+	vec4 hor_normals[2];
+	vec4 vert_normals[2];
 	
-	get_hor_normals( normals, tex_normals , tex_coords);
+	get_hor_normals( hor_normals, tex_normals , tex_coords);
+	get_vert_normals( vert_normals, tex_normals , tex_coords);
+	
+	// check if we're within the outline
+	if( all( notEqual( hor_normals[0].zw , vec2(0.0, 0.0) ) ) && all( notEqual( hor_normals[1].zw , vec2(0.0, 0.0) ) ) ){
+		if( all( notEqual( vert_normals[0].zw , vec2(0.0, 0.0) ) ) && all( notEqual( vert_normals[1].zw , vec2(0.0, 0.0) ) ) ){
+			curr_col = vec2(1.0,1.0);
+		}
+	}
 
 
 
-	// retrieve current element RG colour 
-	vec2 curr_col = (texture(tex_normals, tex_coords)).xy;
 
 	// check if components are black
 	bool bool_cond = all( equal( curr_col , vec2(0.0, 0.0)) );
 
-
-	if( bool_cond){
-		curr_col = vec2(1.0,1.0);
+	if( bool_cond && true){
+			//curr_col = vec2(1.0,1.0);
+		
 	}
 
 	// debug output 
