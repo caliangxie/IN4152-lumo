@@ -4,12 +4,9 @@
 //layout(location = 1) uniform vec3 viewPos;
 layout(location = 2) uniform sampler2D approxNormals;
 
-//layout(location = 3) uniform mat4 lightMVP;
-//layout(location = 4) uniform vec3 lightPos = vec3(3, 3, 3);
  
 // Interpolated output data from vertex shader.
-//in vec3 fragPos; // World-space position
-//in vec3 fragNormal; // World-space normal
+
 layout(origin_upper_left) in vec4 gl_FragCoord; // window relative fragment coordinates
 
 // Output for on-screen color
@@ -20,14 +17,11 @@ void main() {
 	vec2 texCoords = gl_FragCoord.xy / textureSize(approxNormals, 0).x;
 	texCoords.y = 1.0 - texCoords.y;
 
-	outColor = 0.5 - texture(approxNormals, texCoords);
+	// retrieve current element RG colour 
+	vec2 curr_col = texture(approxNormals, texCoords).xy;
 
-	//mat3 grad_kernel =  mat3(0, 1, 0, 1, -4, 1, 0, 1, 0);
-	// Convolve kernel with texture
-	//vec3 col = convolution( grad_kernel, tex_drawing, tex_coords);
+	// debug output 
+	outColor = vec4( curr_col, 0.0, 1.0);
+
 	
-	// Output to screen
-	//outColor = vec4(col, 1.0);
-
-	//outColor =  texture(tex_drawing, tex_coords);
 }
