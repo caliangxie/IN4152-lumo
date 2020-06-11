@@ -130,11 +130,13 @@ void main() {
 
 		// retrieve current element RG colour 
 	vec2 curr_col = texture(tex_normals, tex_coords).xy;
+	vec2 curr_col2 = texture(tex_drawing, tex_coords).xy;
 
 	// check if components are  black
 	bool bool_cond = all( equal( curr_col , vec2(0.0, 0.0)) );
+	//bool bool_cond2 = all( notEqual( curr_col2 , vec2(0.0, 0.0)) );
 
-	if( bool_cond){
+	if( bool_cond ){
 			
 				
 		vec4 hor_normals[2];
@@ -163,11 +165,10 @@ void main() {
 
 				// interpolate over final two points
 				// calculate ratio
-				float temp = distance(tex_coords, interp_normal_h.xy) / ( distance(tex_coords, interp_normal_h.xy) + distance(tex_coords, interp_normal_v.xy));
-				//float temp = 
-				float fin_ratio = temp / distance(interp_normal_h.xy , interp_normal_v.xy );
+				float temp = dot(tex_coords - interp_normal_h.xy, interp_normal_v.xy - interp_normal_h.xy );
+				float fin_ratio = ( 0.5 * ( pow(hor_ratio, 2) + pow(vert_ratio, 2) ) ) /  ( pow(hor_ratio, 2) + pow(vert_ratio, 2) );
 			
-				vec2 interp_grad = mix(interp_normal_h.zw, interp_normal_v.zw, 0.5);
+				vec2 interp_grad = mix(interp_normal_h.zw, interp_normal_v.zw, fin_ratio);
 				curr_col = interp_grad; //interp_normal_v.zw;
 			//	curr_col = vec2(1.0,1.0);
 				// 
