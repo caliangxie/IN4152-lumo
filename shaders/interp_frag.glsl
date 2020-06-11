@@ -3,6 +3,7 @@
 // Global variables for lighting calculations.
 //layout(location = 1) uniform vec3 viewPos;
 layout(location = 2) uniform sampler2D approxNormals;
+layout(location = 3) uniform sampler2D texDrawing;
 
 //layout(location = 3) uniform mat4 lightMVP;
 //layout(location = 4) uniform vec3 lightPos = vec3(3, 3, 3);

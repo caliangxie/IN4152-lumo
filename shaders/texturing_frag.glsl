@@ -11,8 +11,10 @@ layout(location = 0) out vec4 outColor;
 
 void main() {
 	// Map using correct coordinates later
-	vec2 texCoords = gl_FragCoord.xy / textureSize(textureMap, 0).xy;
-	texCoords.y = 1.0 - texCoords.y;
+	vec2 normalCoords = gl_FragCoord.xy / textureSize(interpNormals, 0).x;
+	normalCoords.y = 1.0 - normalCoords.y;
+
+	vec2 texCoords = normalCoords / textureSize(textureMap, 0).x;
 
 	outColor = texture(textureMap, texCoords);
 }
