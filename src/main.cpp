@@ -196,7 +196,7 @@ int main()
 
     GLuint textureMap;
     initTexture(textureMap);
-    pixels = stbi_load("resources/grid.png", &texWidth, &texHeight, &texChannels, 3);
+    pixels = stbi_load("resources/sphere1.png", &texWidth, &texHeight, &texChannels, 3);
     glTextureSubImage2D(textureMap, 0, 0, 0, texWidth, texHeight, GL_RGB, GL_UNSIGNED_BYTE, pixels);
 
     GLuint texMappedTexture;
