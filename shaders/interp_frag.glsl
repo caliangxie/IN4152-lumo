@@ -151,15 +151,24 @@ void main() {
 			
 				// interpolate over horizontal
 
-				// calculate ratio
+				// calculate ratios (hor and vert)
 				
+				float hor_ratio = (tex_coords.y - hor_normals[0].y) / (hor_normals[1].y - hor_normals[0].y);
+				float vert_ratio = (tex_coords.x - vert_normals[0].x) / (vert_normals[1].x - vert_normals[0].x);
 
-				// interpolate over vertical
+
+				vec4 interp_normal_h =  mix(hor_normals[0], hor_normals[1], hor_ratio);
+				vec4 interp_normal_v =  mix(vert_normals[0], vert_normals[1], vert_ratio);
+
+				// interpolate over final two points
 				// calculate ratio
-
-				// 
-				
-				curr_col = vec2(1.0,1.0);
+				float temp = distance(tex_coords, interp_normal_h.xy) / ( distance(tex_coords, interp_normal_h.xy) + distance(tex_coords, interp_normal_v.xy));
+				//float temp = 
+				float fin_ratio = temp / distance(interp_normal_h.xy , interp_normal_v.xy );
+			
+				vec2 interp_grad = mix(interp_normal_h.zw, interp_normal_v.zw, 0.5);
+				curr_col = interp_grad; //interp_normal_v.zw;
+			//	curr_col = vec2(1.0,1.0);
 				// 
 			}
 		}
