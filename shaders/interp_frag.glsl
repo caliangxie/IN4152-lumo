@@ -21,7 +21,7 @@ layout(location = 0) out vec4 outColor;
 void get_hor_normals(inout vec4 normals[2], sampler2D tex, vec2 coord)
 {
 	float step_size = 1.0 / textureSize(tex_normals, 0).x;
-	int text_size =  textureSize(tex_normals, 0).x;
+	int text_size = textureSize(tex_normals, 0).x;
 
 	// initialization
 	normals[0] = vec4(coord, 0.0, 0.0);
@@ -129,7 +129,7 @@ void main() {
 	tex_coords.y = 1.0 - tex_coords.y;
 
 		// retrieve current element RG colour 
-	vec2 curr_col = (texture(tex_normals, tex_coords)).xy;
+	vec2 curr_col = texture(tex_normals, tex_coords).xy;
 
 	// check if components are  black
 	bool bool_cond = all( equal( curr_col , vec2(0.0, 0.0)) );
@@ -144,8 +144,8 @@ void main() {
 		get_vert_normals( vert_normals, tex_normals , tex_coords);
 	
 		// check if we're within the outline
-		if( all( notEqual( hor_normals[0].zw , vec2(0.0, 0.0) ) ) && all( notEqual( hor_normals[1].zw , vec2(0.0, 0.0) ) ) ){
-			if( all( notEqual( vert_normals[0].zw , vec2(0.0, 0.0) ) ) && all( notEqual( vert_normals[1].zw , vec2(0.0, 0.0) ) ) ){
+		if( all( notEqual( hor_normals[0].zw , vec2(0.0, 0.0) ) ) && all( notEqual( hor_normals[1].zw , vec2(0.0, 0.0) ) ) 
+			&& all( notEqual( vert_normals[0].zw , vec2(0.0, 0.0) ) ) && all( notEqual( vert_normals[1].zw , vec2(0.0, 0.0) ) ) ){
 
 				// inside the outline
 				// here we have all 4 normals to interpolate and their positions in the texture, 
@@ -171,7 +171,6 @@ void main() {
 				curr_col = interp_grad; //interp_normal_v.zw;
 			//	curr_col = vec2(1.0,1.0);
 				// 
-			}
 		}
 
 	}

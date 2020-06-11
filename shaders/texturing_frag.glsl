@@ -13,6 +13,7 @@ void main() {
 	// Map using correct coordinates later
 	vec2 normalCoords = gl_FragCoord.xy / textureSize(interpNormals, 0).x;
 	normalCoords.y = 1.0 - normalCoords.y;
+	//outColor = texture(textureMap, normalCoords);
 
 	vec2 texCoords = texture(interpNormals, normalCoords).xy;
 	outColor = texture(textureMap, texCoords);
