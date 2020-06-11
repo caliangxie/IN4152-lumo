@@ -49,7 +49,7 @@ void get_hor_normals(inout vec4 normals[2], sampler2D tex, vec2 coord)
 
 
 	// find normal to the right
-    y_coord = coord.y + step_size;
+    y_coord = coord.y;
 	for (y_coord; y_coord <=  1.0 ; y_coord += step_size){
 		// update location
 		normals[1].y = y_coord;
@@ -101,7 +101,7 @@ void get_vert_normals(inout vec4 normals[2], sampler2D tex, vec2 coord)
 
 
 	// find normal to the right
-    x_coord = coord.x + step_size;
+    x_coord = coord.x;
 	for (x_coord; x_coord <=  1.0 ; x_coord += step_size){
 		// update location
 		normals[1].x = x_coord;
@@ -130,30 +130,42 @@ void main() {
 		// retrieve current element RG colour 
 	vec2 curr_col = (texture(tex_normals, tex_coords)).xy;
 
-		
-	vec4 hor_normals[2];
-	vec4 vert_normals[2];
-	
-	get_hor_normals( hor_normals, tex_normals , tex_coords);
-	get_vert_normals( vert_normals, tex_normals , tex_coords);
-	
-	// check if we're within the outline
-	if( all( notEqual( hor_normals[0].zw , vec2(0.0, 0.0) ) ) && all( notEqual( hor_normals[1].zw , vec2(0.0, 0.0) ) ) ){
-		if( all( notEqual( vert_normals[0].zw , vec2(0.0, 0.0) ) ) && all( notEqual( vert_normals[1].zw , vec2(0.0, 0.0) ) ) ){
-			curr_col = vec2(1.0,1.0);
-		}
-	}
-
-
-
-
-	// check if components are black
+	// check if components are  black
 	bool bool_cond = all( equal( curr_col , vec2(0.0, 0.0)) );
 
-	if( bool_cond && true){
-			//curr_col = vec2(1.0,1.0);
-		
+	if( bool_cond){
+			
+				
+		vec4 hor_normals[2];
+		vec4 vert_normals[2];
+	
+		get_hor_normals( hor_normals, tex_normals , tex_coords);
+		get_vert_normals( vert_normals, tex_normals , tex_coords);
+	
+		// check if we're within the outline
+		if( all( notEqual( hor_normals[0].zw , vec2(0.0, 0.0) ) ) && all( notEqual( hor_normals[1].zw , vec2(0.0, 0.0) ) ) ){
+			if( all( notEqual( vert_normals[0].zw , vec2(0.0, 0.0) ) ) && all( notEqual( vert_normals[1].zw , vec2(0.0, 0.0) ) ) ){
+
+				// inside the outline
+				// here we have all 4 normals to interpolate and their positions in the texture, 
+			
+				// interpolate over horizontal
+
+				// calculate ratio
+				
+
+				// interpolate over vertical
+				// calculate ratio
+
+				// 
+				
+				curr_col = vec2(1.0,1.0);
+				// 
+			}
+		}
+
 	}
+
 
 	// debug output 
 	outColor = vec4( curr_col, 0.0, 1.0);
