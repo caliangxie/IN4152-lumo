@@ -61,6 +61,43 @@ void shaderPass(const Shader &shader, const GLuint inputTex, const GLuint frameb
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
+void shaderPass2(const Shader& shader, const GLuint inputTex, const GLuint inputTex2, const GLuint framebuffer) {
+    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+
+    // Bind the shader
+    shader.bind();
+
+    glUniformMatrix4fv(0, 1, GL_FALSE, glm::value_ptr(mvp));
+
+    // Bind vertex data
+    glBindVertexArray(vao);
+
+    // Bind the drawing texture to texture slot 0
+    GLuint texture_unit = 0;
+    glActiveTexture(GL_TEXTURE0 + texture_unit);
+    glBindTexture(GL_TEXTURE_2D, inputTex);
+    glUniform1i(2, texture_unit);
+
+    GLuint texture_unit2 = 1;
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, inputTex2);
+    glUniform1i(3, texture_unit2);
+
+    // Set viewport size
+    glViewport(0, 0, WIDTH, HEIGHT);
+
+    // Clear the framebuffer to black and depth to maximum value
+    glClearDepth(1.0f);
+    glClearColor(0.1f, 0.2f, 0.3f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glDisable(GL_CULL_FACE);
+    glEnable(GL_DEPTH_TEST);
+
+    // Execute draw command
+    glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(mesh.indices.size()), GL_UNSIGNED_INT, nullptr);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
 inline void initTexture(GLuint &tex) {
     glCreateTextures(GL_TEXTURE_2D, 1, &tex);
     glTextureStorage2D(tex, 1, GL_RGB8, WIDTH, HEIGHT);
@@ -177,45 +214,47 @@ int main()
         shaderPass(approxShader, texDrawing, framebuffer);
 
         glNamedFramebufferTexture(framebuffer, GL_COLOR_ATTACHMENT0, texInterp, 0);
-        shaderPass(interpShader, texApprox, framebuffer);
+        //shaderPass(interpShader, texApprox, framebuffer);
+        shaderPass2(interpShader, texApprox, texDrawing, framebuffer);
 
 
         glNamedFramebufferTexture(framebuffer, GL_COLOR_ATTACHMENT0, texMappedTexture, 0);
-        {
-            glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
-            // Bind the shader
-            texturingShader.bind();
+        shaderPass2(texturingShader, texInterp, textureMap, framebuffer);
+        //{
+        //    glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+        //    // Bind the shader
+        //    texturingShader.bind();
 
-            glUniformMatrix4fv(0, 1, GL_FALSE, glm::value_ptr(mvp));
+        //    glUniformMatrix4fv(0, 1, GL_FALSE, glm::value_ptr(mvp));
 
-            // Bind vertex data
-            glBindVertexArray(vao);
+        //    // Bind vertex data
+        //    glBindVertexArray(vao);
 
-            // Bind the drawing texture to texture slot 0
-            GLuint texture_unit = 0;
-            glActiveTexture(GL_TEXTURE0 + texture_unit);
-            glBindTexture(GL_TEXTURE_2D, texInterp);
-            glUniform1i(2, texture_unit);
+        //    // Bind the drawing texture to texture slot 0
+        //    GLuint texture_unit = 0;
+        //    glActiveTexture(GL_TEXTURE0 + texture_unit);
+        //    glBindTexture(GL_TEXTURE_2D, texInterp);
+        //    glUniform1i(2, texture_unit);
 
-            GLuint texture_unit2 = 1;
-            glActiveTexture(GL_TEXTURE1);
-            glBindTexture(GL_TEXTURE_2D, textureMap);
-            glUniform1i(3, texture_unit2);
+        //    GLuint texture_unit2 = 1;
+        //    glActiveTexture(GL_TEXTURE1);
+        //    glBindTexture(GL_TEXTURE_2D, textureMap);
+        //    glUniform1i(3, texture_unit2);
 
-            // Set viewport size
-            glViewport(0, 0, WIDTH, HEIGHT);
+        //    // Set viewport size
+        //    glViewport(0, 0, WIDTH, HEIGHT);
 
-            // Clear the framebuffer to black and depth to maximum value
-            glClearDepth(1.0f);
-            glClearColor(0.1f, 0.2f, 0.3f, 1.0f);
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-            glDisable(GL_CULL_FACE);
-            glEnable(GL_DEPTH_TEST);
+        //    // Clear the framebuffer to black and depth to maximum value
+        //    glClearDepth(1.0f);
+        //    glClearColor(0.1f, 0.2f, 0.3f, 1.0f);
+        //    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        //    glDisable(GL_CULL_FACE);
+        //    glEnable(GL_DEPTH_TEST);
 
-            // Execute draw command
-            glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(mesh.indices.size()), GL_UNSIGNED_INT, nullptr);
-            glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        }
+        //    // Execute draw command
+        //    glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(mesh.indices.size()), GL_UNSIGNED_INT, nullptr);
+        //    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        //}
 
         {
             // Bind the shader
